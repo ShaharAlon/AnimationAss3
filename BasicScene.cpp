@@ -260,10 +260,12 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 camera->TranslateInSystem(system, {0, 0, -0.1f});
                 break;
             case GLFW_KEY_SPACE:
-                isCCD = !isCCD;
+                if(!isFabrik)
+                    isCCD = !isCCD;
                 break;
             case GLFW_KEY_I:
-                isFabrik = !isFabrik;
+                if(!isCCD)
+                    isFabrik = !isFabrik;
                 break;
             case GLFW_KEY_P:
                 PrintRMats();
@@ -276,10 +278,8 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 pickedModel = cyls[pickedIndex];
                 break;
             case GLFW_KEY_T:
-                for (int i = 0; i < cyls.size(); i++) {
-                    std::cout << "Start" << i << " position: " << GetStartPos(i).transpose() << std::endl;
+                for (int i = 0; i < cyls.size(); i++) 
                     std::cout << "Tip" << i << " position: " << GetTipPos(i).transpose() << std::endl;
-                }
                 break;
 
         }
@@ -326,7 +326,6 @@ Eigen::Matrix3d BasicScene::GetParentRot(int i) {
 
 void BasicScene::CCD()
 {
-        double PI = 3.14159265359;
         Eigen::Vector3d dest = sphere1->GetTranslation().cast<double>();
         Eigen::Vector3d firstR = GetStartPos(0);
         double dist = (dest - firstR).norm();
@@ -347,7 +346,7 @@ void BasicScene::CCD()
             if (dot > 1 || dot < -1) 
                 dot = dot / abs(dot);
             double angle = acos(dot)/10;
-            normal = cyls[LinkID]->GetRotation().cast<double>().inverse() * normal;
+            normal = cyls[LinkID]->GetRotation().cast<double>().inverse() * normal; 
             cyls[LinkID]->RotateByDegree(angle,normal.cast<float>());
             LinkID--;
         }
